@@ -1,0 +1,60 @@
+@model loginform_with_database.Models.ProfileModel
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="container login-container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="login-form-1">
+                <h3>Your Profile</h3>
+
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger" role="alert">@TempData["Error"]</div>
+                }
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success" role="alert">@TempData["Success"]</div>
+                }
+
+                <form asp-action="Profile" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="mb-3">
+                        <label asp-for="Username" class="form-label"></label>
+                        <input asp-for="Username" class="form-control" readonly />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DisplayName" class="form-label"></label>
+                        <input asp-for="DisplayName" class="form-control" />
+                        <span asp-validation-for="DisplayName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="AvatarUrl" class="form-label"></label>
+                        <input asp-for="AvatarUrl" class="form-control" />
+                        <span asp-validation-for="AvatarUrl" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="RegisteredAt" class="form-label"></label>
+                        <input asp-for="RegisteredAt" class="form-control" readonly />
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a asp-action="ChangePassword" class="btn btn-secondary">Change Password</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

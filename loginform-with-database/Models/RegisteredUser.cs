@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace loginform_with_database.Models;
 
-public class User
+public class RegisteredUser
 {
     [Key]
     public int Id { get; set; }
@@ -15,6 +15,9 @@ public class User
     [MinLength(6)]
     public string Password { get; set; } = string.Empty;
 
-    // FullName removed: registration now requires only Username and Password
-}
+    public DateTime RegisteredAt { get; set; } = DateTime.UtcNow;
 
+    // Optional profile fields
+    public string? DisplayName { get; set; }
+    public string? AvatarUrl { get; set; }
+}

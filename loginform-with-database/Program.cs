@@ -1,10 +1,20 @@
 using loginform_with_database.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add cookie authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/Login";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    });
 
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -13,19 +23,20 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
-// Create database if it doesn't exist
+// Apply pending EF Core migrations (preferred to EnsureCreated when using migrations)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.EnsureCreated();
+        // Apply any pending migrations to keep the database schema in sync with the model
+        context.Database.Migrate();
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while creating the database.");
+        logger.LogError(ex, "An error occurred while applying migrations to the database.");
     }
 }
 
@@ -41,6 +52,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
